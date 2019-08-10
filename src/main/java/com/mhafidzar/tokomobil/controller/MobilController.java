@@ -10,14 +10,11 @@ import com.mhafidzar.tokomobil.service.MobilService;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -25,7 +22,6 @@ import org.springframework.web.servlet.ModelAndView;
  * @author natar
  */
 @Controller
-@RequestMapping(value = "api")
 public class MobilController {
     
     @Autowired
@@ -56,7 +52,7 @@ public class MobilController {
     @PostMapping("/mobil")
     public ModelAndView carAddSave(@Valid Mobil mobil){
         mobilService.carAddSave(mobil);
-        return new ModelAndView("redirect:/api/mobil");
+        return new ModelAndView("redirect:/mobil");
     }
     
     @GetMapping("/mobil/{id}")
@@ -71,13 +67,13 @@ public class MobilController {
     @PutMapping("/mobil/{id}")
     public ModelAndView carEditSave(@PathVariable("id") int id, @Valid Mobil mobil){
         mobilService.carEditSave(mobil);
-        return new ModelAndView("redirect:/api/mobil");
+        return new ModelAndView("redirect:/mobil");
     }
     
     @DeleteMapping("/mobil/{id}")
     public ModelAndView carDelete(@PathVariable("id") int id){
         Mobil mobil = mobilService.getCarById(id).orElse(null);
         mobilService.carDelete(mobil);
-        return new ModelAndView("redirect:/api/mobil");
+        return new ModelAndView("redirect:/mobil");
     }
 }
