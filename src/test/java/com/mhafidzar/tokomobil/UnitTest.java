@@ -5,7 +5,10 @@
  */
 package com.mhafidzar.tokomobil;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mhafidzar.tokomobil.model.Mobil;
+import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -15,10 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
@@ -30,6 +35,8 @@ import org.springframework.web.client.HttpClientErrorException;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TokomobilApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UnitTest {
+    private static final ObjectMapper om = new ObjectMapper();
+    
     final String merk = "toyota";
     final String tipe = "supra";
 
@@ -94,24 +101,24 @@ public class UnitTest {
     }
 
     @Test
-    public void testCarEdit() {
-        int id = 3;
+    public void testCarEdit() throws JsonProcessingException {
+        Mobil mobil = new Mobil();
+        mobil.setNoKerangka("7788990012");
+        mobil.setNoPolisi("N 2886 CA");
+        mobil.setTahun(2018);
         
-        Mobil mobil = restTemplate.getForObject(getRootUrl() + "/api/mobil/" + id, Mobil.class);
-        mobil.setTahun(2017);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(om.writeValueAsString(mobil), headers);
 
-        restTemplate.put(getRootUrl() + "/api/mobil/" + merk + "/" + tipe, mobil);
-
-        Mobil updatedMobil = restTemplate.getForObject(getRootUrl() + "/api/mobil/" + id, Mobil.class);
-        assertNotNull(updatedMobil);
+        ResponseEntity<String> response = restTemplate.exchange(getRootUrl() + "/api/mobil/" + merk + "/" + tipe, HttpMethod.PUT, entity, String.class);
+        assertNotNull(response.getStatusCode());
     }
 
     @Test
-    public void testCarDelete() {        
-        int id = 3;
-        Mobil mobil = restTemplate.getForObject(getRootUrl() + "/api/mobil/" + id, Mobil.class);
-        assertNotNull(mobil);
-
-        restTemplate.delete(getRootUrl() + "/api/mobil/" + merk + "/" + tipe);
+    public void testCarDelete() {
+        HttpEntity<String> entity = new HttpEntity<>(null, new HttpHeaders());
+        ResponseEntity<String> response = restTemplate.exchange(getRootUrl() + "/api/mobil/" + merk + "/" + tipe, HttpMethod.DELETE, entity, String.class);
+        assertNotNull(response.getStatusCode());
     }
 }
